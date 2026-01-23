@@ -1,34 +1,54 @@
 import json
 import tensorflow as tf
 
-# 1) Load saved model
+# 1) load saved model
 model = tf.keras.models.load_model("model.keras")
 
-# 2) Load labels (saved during training)
+# 2) load labels
 with open("label_map.json", "r") as f:
-    idx_to_cat = {int(k): v for k, v in json.load(f).items()}
+    label_data = json.load(f)
 
-def clean_text(s: str) -> str:
-    return " ".join(str(s).lower().strip().split())
+# JSON keys are strings, convert them back to ints
+idx_to_cat = {}
+for k, v in label_data.items():
+    idx_to_cat[int(k)] = v
 
-def predict_category(item_name: str, threshold=0.5):
+confidence_treshold = 0.3
+
+def clean_text(text):
+    text = str(text).lower().strip()
+    text = " ".join(text.split())
+    return text
+
+def predict_category(item_name):
+    # clean input
     item = clean_text(item_name)
     x = tf.constant([[item]])
+
     probs = model.predict(x, verbose=0)[0]
     max_prob = float(probs.max())
     pred_idx = int(probs.argmax())
+    pred_cat = idx_to_cat[pred_idx]
 
-    if max_prob < threshold:
-        return "Other", max_prob
+    return pred_cat, max_prob
 
-    return idx_to_cat[pred_idx], max_prob
-
-if __name__ == "__main__":
+def main():
     print("Grocery categoriser (type 'q' to quit)\n")
+
     while True:
         item = input("Enter item: ").strip()
-        if item.lower() in {"q", "quit", "exit"}:
+        if item.lower() in ["q", "quit", "exit"]:
             break
 
         category, conf = predict_category(item)
-        print(f"→ {category} (confidence: {conf:.2f})\n")
+
+        if conf < confidence_treshold:
+            print(
+                f"→ I'm not confident enough to classify this item "
+                f"(best guess: {category}, {conf:.2f})\n"
+            )
+        else:
+            print(f"→ {category} (confidence: {conf:.2f})\n")
+
+if __name__ == "__main__":
+    main()
