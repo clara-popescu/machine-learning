@@ -1,6 +1,3 @@
-# image_interface.py
-# Task 3: image -> product name -> grocery category (using Task 1)
-
 import json
 import numpy as np
 import tensorflow as tf
@@ -8,7 +5,6 @@ from PIL import Image
 import cv2
 
 # load Teachable Machine image model
-
 TM_MODEL_PATH = "keras_model.h5"
 TM_LABELS_PATH = "labels.txt"
 
@@ -30,10 +26,10 @@ def predict_image_label(image_path):
 
     img_array = np.asarray(img).astype(np.float32)
     # scale to [-1, 1]
-    normalized = (img_array / 127.5) - 1.0
+    normalised = (img_array / 127.5) - 1.0
 
-    # model expects shape (1, 224, 224, 3)
-    data = np.expand_dims(normalized, axis=0)
+    # shape (1, 224, 224, 3) 1 img, height, width, 3 colour channels
+    data = np.expand_dims(normalised, axis=0)
 
     predictions = image_model.predict(data, verbose=0)[0]
     idx = int(np.argmax(predictions))
@@ -45,16 +41,16 @@ def predict_image_label(image_path):
 
 
 def predict_image_from_frame(frame):
-    # take a webcam frame preprocess it like the Teachable Machine image and return (class_name, confidence).
+    # take a webcam frame preprocess it like the Teachable Machine image and return (class_name, confidence)
 
     # convert from BGR (OpenCV) to RGB
     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (224, 224))
 
     img_array = img.astype(np.float32)
-    normalized = (img_array / 127.5) - 1.0
+    normalised = (img_array / 127.5) - 1.0
 
-    data = np.expand_dims(normalized, axis=0)
+    data = np.expand_dims(normalised, axis=0)
 
     predictions = image_model.predict(data, verbose=0)[0]
     idx = int(np.argmax(predictions))
@@ -156,7 +152,6 @@ def main():
         camera_mode()
         return
 
-    # default: image path mode (what you already had)
     print("\nImage path mode (type 'q' to quit).\n")
 
     while True:
