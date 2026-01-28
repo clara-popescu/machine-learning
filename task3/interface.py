@@ -83,7 +83,7 @@ def clean_text(text):
 
 
 def predict_text_category(item_name):
-    # use task 1 model to classify an item name into a grocery category
+    # task 1 model to classify an item name into a grocery category
     item = clean_text(item_name)
     x = np.array([item], dtype=object)
 

@@ -38,7 +38,7 @@ def predict_category(item_name):
 
 
 def get_categories_for_basket(item_list):
-    # Get a sorted list of unique categories for a basket of item names.
+    # get a sorted list of unique categories for a basket of item names
     cats = []
 
     for item in item_list:
